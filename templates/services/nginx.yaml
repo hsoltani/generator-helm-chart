@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "generator-helm-chart.fullname" . }}-nginx
+  name: {{ template "nginx.fullname" . }}-nginx
   labels:
-    app: {{ template "generator-helm-chart.name" . }}-nginx
+    app: {{ template "nginx.name" . }}-nginx
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
@@ -24,5 +24,5 @@ spec:
       nodePort: {{ .Values.service.nginx.nodePorts.http }}
       {{- end }}
   selector:
-    app: {{ template "generator-helm-chart.name" . }}-nginx
+    app: {{ template "nginx.name" . }}-nginx
     release: {{ .Release.Name }}
