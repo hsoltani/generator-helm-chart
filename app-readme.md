@@ -1,3 +1,3 @@
-# generator-helm-chart
+# nginx
 
-> A project for centos
+> some nginx container
