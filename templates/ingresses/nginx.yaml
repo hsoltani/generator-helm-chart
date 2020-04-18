@@ -2,7 +2,7 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: {{ template "generator-helm-chart.fullname" . }}-nginx
+  name: {{ template "nginx.fullname" . }}-nginx
   annotations:
     {{- if (eq .Values.config.clusterProvider "aks") }}
     kubernetes.io/ingress.class: addon-http-application-routing
@@ -17,7 +17,7 @@ metadata:
     nginx.ingress.kubernetes.io/ssl-redirect: 'true'
     {{- end }}
   labels:
-    app: {{ template "generator-helm-chart.name" . }}-nginx
+    app: {{ template "nginx.name" . }}-nginx
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
@@ -28,11 +28,11 @@ spec:
         paths:
           - path: {{ .Values.ingress.nginx.path }}
             backend:
-              serviceName: {{ template "generator-helm-chart.fullname" . }}-nginx
+              serviceName: {{ template "nginx.fullname" . }}-nginx
               servicePort: http
   {{- if .Values.ingress.nginx.tls }}
   tls:
-    - secretName: {{ template "generator-helm-chart.nginx-certificate" . }}
+    - secretName: {{ template "nginx.nginx-certificate" . }}
       hosts:
         - {{ .Values.ingress.nginx.hostname }}
   {{- end }}
