@@ -1,55 +1,64 @@
 {{- if .Values.persistence.stash.enabled }}
-apiVersion: stash.appscode.com/v1alpha1
-kind: Repository
+apiVersion: batch/v1
+kind: Job
 metadata:
-  name: {{ template "generator-helm-chart.fullname" . }}-data
+  name: {{ template "nginx.fullname" . }}-backup-init
   labels:
-    app: {{ template "generator-helm-chart.name" . }}-data
+    app: {{ template "nginx.name" . }}-backup-init
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
+  annotations:
+    helm.sh/hook: pre-install
+    helm.sh/hook-weight: '3'
+    helm.sh/hook-delete-policy: before-hook-creation
 spec:
-  wipeOut: false
-  backend:
-    storageSecretName: {{ .Values.persistence.stash.secret | quote }}
-    {{ .Values.persistence.stash.type }}:
-      {{- if (or (eq "gcs" .Values.persistence.stash.type) (eq "s3" .Values.persistence.stash.type)) }}
-      bucket: {{ .Values.persistence.stash.bucket | quote }}
-      {{- end }}
-      {{- if (eq "s3" .Values.persistence.stash.type) }}
-      endpoint: {{ .Values.persistence.stash.endpoint | quote }}
-      {{- end }}
-      {{- if (eq "azure" .Values.persistence.stash.type) }}
-      container: {{ .Values.persistence.stash.container | quote }}
-      {{- end }}
-      prefix: '{{ .Values.persistence.stash.prefix }}/{{ .Release.Namespace }}/data'
+  strategy:
+    type: {{ .Values.config.updateStrategy }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "nginx.name" . }}-backup-init
+        release: {{ .Release.Name }}
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: kubectl
+          image: codejamninja/stash-cli:0.0.1
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -c
+            - |
+              kubectl stash cp repository {{ .Values.persistence.stash.repository }} --namespace=kube-system --to-namespace={{ .Release.Namespace }}
 ---
 apiVersion: stash.appscode.com/v1beta1
-kind: BackupConfiguration
+kind: BackupBatch
 metadata:
-  name: {{ template "generator-helm-chart.fullname" . }}-data
+  name: {{ template "nginx.fullname" . }}
   labels:
-    app: {{ template "generator-helm-chart.name" . }}-data
+    app: {{ template "nginx.name" . }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
   repository:
-    name: {{ template "generator-helm-chart.fullname" . }}-data
+    name: {{ .Values.persistence.stash.repository | quote }}
   paused: {{ .Values.persistence.stash.paused }}
   schedule: {{ .Values.persistence.stash.schedule | quote }}
   retentionPolicy:
     name: retention-policy
     keepLast: {{ .Values.persistence.stash.keepLast }}
     prune: true
-  target:
-    ref:
-      apiVersion: apps/v1
-      kind: Deployment
-      name: {{ template "generator-helm-chart.fullname" . }}-generator-helm-chart
-    volumeMounts:
-      - name: data
-        mountPath: /_data
-    paths:
-      - /_data
+  members:
+    - target:
+        ref:
+          apiVersion: apps/v1
+          kind: Deployment
+          name: {{ template "nginx.fullname" . }}-nginx
+        volumeMounts:
+          - name: data
+            mountPath: /data
+        paths:
+          - /data
 {{- end }}
