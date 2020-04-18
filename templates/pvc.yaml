@@ -2,9 +2,9 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: {{ template "generator-helm-chart.fullname" . }}
+  name: {{ template "nginx.fullname" . }}
   labels:
-    app: {{ template "generator-helm-chart.name" . }}
+    app: {{ template "nginx.name" . }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
