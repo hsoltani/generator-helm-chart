@@ -10,7 +10,6 @@ config:
   nginx:
     baseUrl: ''
     hostname: ''
-  secret: 'secret'
 
 service:
   nginx:
@@ -38,19 +37,13 @@ persistence:
   velero:
     enabled: false
   stash:
-    bucket: ''
-    container: ''
     enabled: false
-    endpoint: s3.amazonaws.com
     keepLast: 30
     paused: false
-    prefix: stash
+    repository: stash-stash
     schedule: '0 0 * * *'
-    secret: stash-config-stash-config
-    type: s3
     restore:
-      snapshot:
-        data: ''
+      snapshot: ''
 
 probes:
   liveness:
