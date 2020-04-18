@@ -1,16 +1,15 @@
-name: generator-helm-chart
-home: https://github.com/hsoltani/generator-helm-chart
-icon: https://nginx.org/nginx.png
-version: 0.4.0
+name: nginx
+home: https://github.com/codejaminja/charts
+icon: https://www.nginx.com/wp-content/uploads/2019/10/NGINX-Logo-White-Endorsement-RGB.svg
+version: 0.0.1
 appVersion: latest
-description: 'A project for centos'
+description: 'some nginx container'
 keywords:
-  - generator-helm-chart
   - nginx
+  - file
   - server
-  - https://nginx.org/nginx.png
 sources:
-  - https://github.com/hsoltani/generator-helm-chart
+  - https://github.com/codejaminja/charts
 maintainers:
-  - name: 'Hannaneh Soltani'
-    email: hannanehsoltani@gmail.com
+  - name: 'Jam Risser'
+    email: jam@codejam.ninja
